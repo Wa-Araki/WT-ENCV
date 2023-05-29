@@ -48,6 +48,12 @@ To use the model, follow these steps:
 
 3. Evaluate the performance of the model and make any necessary adjustments to improve its accuracy and interpretability.
 
+
+## Related Accepted Paper
+This section provides a link to the academic paper that is related to our project and have been accepted.
+
+- [**Chemometrics Approach Based on Wavelet Transforms for the Estimation of Monomer Concentrations from FTIR Spectra**](https://pubs.acs.org/doi/10.1021/acsomega.3c01515)
+
 ## Contributing
 We welcome contributions to the WT-ENCV repository. To contribute, please:
 
