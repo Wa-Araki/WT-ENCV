@@ -168,7 +168,7 @@ class WTENCV():
                 plt.figure(figsize=(15,4))
                 if title is not None:
                     target_title = title[i] if isinstance(title, (list, tuple)) else title
-                    plt.title(f"{target_title[i]}")
+                    plt.title(f"{target_title}")
                 # Use corresponding color for each target
                 target_color = color[i] if isinstance(color, (list, tuple)) else color
                 reshaped_coef_ = coef.reshape(self.wavelet_num+1, self.len_ir_spectrum)
