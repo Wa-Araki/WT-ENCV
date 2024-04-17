@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy import signal
 
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.linear_model import ElasticNetCV
+from sklearn.linear_model import ElasticNetCV, MultiTaskElasticNetCV
 from scipy.ndimage import gaussian_filter
 
 class WTENCV():
@@ -167,14 +167,49 @@ class WTENCV():
             for i, coef in enumerate(self.model.coef_):
                 plt.figure(figsize=(15,4))
                 if title is not None:
-                    plt.title(f"{title} - Target {i+1}")
+                    target_title = title[i] if isinstance(title, (list, tuple)) else title
+                    plt.title(f"{target_title[i]}")
                 # Use corresponding color for each target
                 target_color = color[i] if isinstance(color, (list, tuple)) else color
-                plt.plot(wavelet_widths, coef, color=target_color)
+                reshaped_coef_ = coef.reshape(self.wavelet_num+1, self.len_ir_spectrum)
+                arr = np.zeros_like(reshaped_coef_)
+                for j in range(self.wavelet_num):
+                    arr[j]= gaussian_filter(reshaped_coef_[j], sigma=wavelet_widths[j] * self.GAUSSIAN_RICKER_WIDTH_RATIO)
+
+                for s,p in zip(arr, (wavelet_widths * self.GAUSSIAN_RICKER_WIDTH_RATIO).T):
+                    if p==0:
+                        plt.plot(self.wave_numbers, s, color = target_color, alpha=1.0)
+                    else:
+                        plt.plot(
+                            self.wave_numbers,
+                            s * np.sqrt(2 * np.pi * p**2),
+                            color=target_color,
+                            alpha=min(1, color_intensity_parameter + 1/(p + 1e-13))
+                        )
+                plt.gca().invert_xaxis()
+                plt.yticks(ticks=[])
+
                 plt.show()
         else:
             plt.figure(figsize=(15,4))
             if title is not None:
                 plt.title(title)
-            plt.plot(wavelet_widths, self.model.coef_, color=color)
+            reshaped_coef_ = self.coef_.reshape(self.wavelet_num+1, self.len_ir_spectrum)
+            arr = np.zeros_like(reshaped_coef_)
+            for j in range(self.wavelet_num):
+                arr[j]= gaussian_filter(reshaped_coef_[j], sigma=wavelet_widths[j] * self.GAUSSIAN_RICKER_WIDTH_RATIO)
+
+            for s,p in zip(arr, (wavelet_widths * self.GAUSSIAN_RICKER_WIDTH_RATIO).T):
+                if p==0:
+                    plt.plot(self.wave_numbers, s, color = color, alpha=1.0)
+                else:
+                    plt.plot(
+                        self.wave_numbers,
+                        s * np.sqrt(2 * np.pi * p**2),
+                        color=color,
+                        alpha=min(1, color_intensity_parameter + 1/(p + 1e-13))
+                    )
+            plt.gca().invert_xaxis()
+            plt.yticks(ticks=[])
+
             plt.show()
